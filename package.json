@@ -1,0 +1,19 @@
+{
+  "name": "project-notes",
+  "version": "0.1.0",
+  "description": "Agent skill for lifecycle-based project proposals, decisions, and verification notes.",
+  "license": "UNLICENSED",
+  "files": [
+    "SKILL.md",
+    "README.md"
+  ],
+  "keywords": [
+    "agent-skill",
+    "agent-notes",
+    "decision-records"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QiufengGit/project-agent-setup.git"
+  }
+}
