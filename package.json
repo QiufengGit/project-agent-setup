@@ -1,17 +1,17 @@
 {
-  "name": "project-notes",
+  "name": "project-agent-setup",
   "version": "0.1.0",
-  "description": "Agent skill for lifecycle-based project proposals, decisions, and verification notes.",
+  "description": "Agent skills for project workspaces, task handoffs, and decision notes.",
   "license": "UNLICENSED",
   "files": [
-    "SKILL.md",
     "README.md",
-    "skills/project-workspace"
+    "skills/"
   ],
   "keywords": [
     "agent-skill",
     "agent-notes",
-    "decision-records"
+    "decision-records",
+    "project-workspace"
   ],
   "repository": {
     "type": "git",
