@@ -1,79 +1,84 @@
 # Project Agent Setup
 
-按生命周期和决策类别维护项目的 `.agents/notes/`。skill 名称为 `project-notes`，入口为 [SKILL.md](SKILL.md)。
+两份可以独立使用的轻量项目管理 skill：
 
-## 文件结构
+| Skill | 用途 | 入口 |
+| --- | --- | --- |
+| `project-workspace` | 目录归属、文件导航、任务交接与恢复 | [SKILL.md](skills/project-workspace/SKILL.md) |
+| `project-notes` | 长期提案、决策理由、替代方案与验证记录 | [SKILL.md](SKILL.md) |
+
+`project-workspace` 约定工作区根层只保留目录和 Markdown，使用 `code/`、`resources/`、`results/`、`scripts/`，各一级目录附 README。任务和实际结果目录以 `YYYY-MM-DD-` 开头；工程内部布局和冻结归档保持各自结构。
+
+## 文件结构与依赖
 
 ```text
 project-agent-setup/
-├── SKILL.md       # 标准 Agent Skills 入口，含 name 和 description
-├── package.json   # npm 打包元数据和文件白名单
-└── README.md      # 安装与使用说明
+├── SKILL.md                     # project-notes，保留原安装入口
+├── skills/
+│   └── project-workspace/
+│       ├── SKILL.md
+│       ├── agents/openai.yaml
+│       └── references/templates.md
+├── package.json                 # npm 打包元数据和文件白名单
+└── README.md
 ```
 
-正文和笔记模板自包含，不依赖插件、hooks 或额外运行库。导入 skill 后，只有在用户要求记录或整理项目决策时才维护目标项目中的笔记。
+`project-notes` 的正文和模板自包含。`project-workspace` 按需读取包内的 `references/templates.md`，复制或分享时应带上整个目录；它可与 `project-notes` 配合，但没有必须安装的其他 skill。两者均不要求插件、hooks 或额外运行库；安装器本身需要 Node.js/npm。
 
-## 从 GitHub 导入
+通用流程保存在 skill 中，具体项目的约定、环境和进度保存在目标项目内。模板中的项目名和日期仅为示例，不要求存在相应工程。仓库不包含实际项目的任务记录、环境配置、数据或实验结果。
 
-在目标项目目录执行：
+## 从 GitHub 安装
+
+在目标项目目录执行，安装工作区管理 skill：
+
+```bash
+npx skills@1.7.0 add QiufengGit/project-agent-setup --full-depth --skill project-workspace --agent codex
+```
+
+安装长期决策记录 skill，沿用原命令：
 
 ```bash
 npx skills@1.7.0 add QiufengGit/project-agent-setup --skill project-notes --agent codex
 ```
 
-也可以使用 npm：
+根目录保留了 `project-notes` 的 `SKILL.md`，因此发现嵌套的 `project-workspace` 时需要 `--full-depth`。仅列出所有可安装的 skill：
 
 ```bash
-npm exec --yes --package=skills@1.7.0 -- skills add QiufengGit/project-agent-setup --skill project-notes --agent codex
+npx skills@1.7.0 add QiufengGit/project-agent-setup --full-depth --list
 ```
 
-仓库入口直接提供标准的 SKILL.md；安装后 skill 名称仍为 project-notes。
+默认安装到目标项目；多个项目共用时可增加 `--global`。其他 agent 使用安装器支持的 `--agent` 名称。
 
-## 从本地目录导入
+## 从本地目录安装
 
-在要使用该 skill 的目标项目目录执行。将 `/path/to/project-notes` 替换为本 skill 的实际绝对目录；不要把源目录当作另一份安装的目标目录。
+在目标项目目录执行，将 `/path/to/project-agent-setup` 替换为本仓库的实际路径：
 
 ```bash
-npx skills@1.7.0 add /path/to/project-notes --agent codex
+npx skills@1.7.0 add /path/to/project-agent-setup --full-depth --skill project-workspace --agent codex
 ```
 
-仅查看可导入的 skill：
-
-```bash
-npx skills@1.7.0 add /path/to/project-notes --list
-```
-
-## 通过 npm exec 导入
-
-与上述 npx 命令等价：
-
-```bash
-npm exec --yes --package=skills@1.7.0 -- skills add /path/to/project-notes --agent codex
-```
-
-需要其他 agent 时，使用安装器支持的 `--agent` 名称。默认安装到目标项目；需要全局安装时显式增加 `--global`。
-
-## npm 打包与安装
-
-本包可以本地打包，无须发布到 registry：
-
-```bash
-npm pack /path/to/project-notes
-```
-
-生成 `project-notes-0.1.0.tgz`。要通过 npm 安装该归档并导入 agent，在目标项目执行：
-
-```bash
-npm install --no-save --package-lock=false --ignore-scripts /path/to/project-notes-0.1.0.tgz
-npx skills@1.7.0 add ./node_modules/project-notes --agent codex
-```
-
-`npm install` 只负责放置包文件，随后用 skills 安装器将其导入 agent。包没有自动安装脚本或命令行入口，因此不使用 `npx project-notes`。本地归档可直接使用；未发布到 npm registry，不能把裸包名当作已发布的安装地址。
+也可以直接指定 `/path/to/project-agent-setup/skills/project-workspace`；直接指向 skill 目录时不需要 `--full-depth`。需要 `project-notes` 时将 `--skill` 的值替换为 `project-notes`。
 
 ## 使用
 
-在支持命名调用的 agent 中调用 `$project-notes`，或要求 agent 使用 project-notes 记录提案、实现决策、验证结果或归档旧决策。
+- 用 `$project-workspace` 初始化或整理指定工作区，保存中间进展，或从已有任务入口继续。单次问答不需要初始化工作区。
+- 用 `$project-notes` 保存有长期价值的提案、实施决策和排查结论。笔记路径为 `.agents/notes/<lifecycle>/<class>/yyyy-mm-dd-topic-title.md`，具体分类见其 skill 正文。
 
-生成的笔记采用 `.agents/notes/<lifecycle>/<class>/yyyy-mm-dd-topic-title.md`。生命周期为 `proposed`、`implemented`、`rejected`、`archived`；类别为 `feature`、`bug-fix`、`simplification`、`architecture`、`process`、`testing`。
+换账号或重连后，任务恢复依赖项目内已经保存的记录；安装 skill 本身不会同步聊天历史或恢复已经退出的训练进程。通用脚本归入目标项目的 `scripts/`，其运行依赖由该目录的 README 说明。
 
-包内未附带具体项目的笔记或实验结果。笔记路径相对于目标项目，安装位置可以位于其他项目、全局目录或 `node_modules`。
+## 可选：npm 本地打包
+
+包名沿用 `project-notes`，文件白名单包含两份 skill；尚未发布到 npm registry。
+
+```bash
+npm pack /path/to/project-agent-setup
+```
+
+生成 `project-notes-0.1.0.tgz`。在目标项目安装本地归档，再导入需要的 skill：
+
+```bash
+npm install --no-save --package-lock=false --ignore-scripts /path/to/project-notes-0.1.0.tgz
+npx skills@1.7.0 add ./node_modules/project-notes --full-depth --skill project-workspace --agent codex
+```
+
+`npm install` 仅放置包文件；包没有自动安装脚本或命令行入口，不使用 `npx project-notes`。

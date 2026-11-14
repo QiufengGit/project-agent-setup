@@ -5,7 +5,8 @@
   "license": "UNLICENSED",
   "files": [
     "SKILL.md",
-    "README.md"
+    "README.md",
+    "skills/project-workspace"
   ],
   "keywords": [
     "agent-skill",

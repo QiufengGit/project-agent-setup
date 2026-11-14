@@ -1,0 +1,4 @@
+interface:
+  display_name: "项目工作区"
+  short_description: "统一项目目录与任务入口，保存中间进度并支持跨会话交接和恢复"
+  default_prompt: "使用 $project-workspace 为当前项目初始化轻量目录约定和任务恢复入口，复用已有文件。"
